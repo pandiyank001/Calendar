@@ -404,7 +404,7 @@ const mockEvents: CalendarEvent[] = [
   
 ]
 
-export async function fetchCalendarEvents(startDate: Date, endDate: Date): Promise<CalendarEvent[]> {
+export async function fetchCalendarEvents(_startDate: Date, _endDate: Date): Promise<CalendarEvent[]> {
   await new Promise((resolve) => setTimeout(resolve, 500))
 
   return mockEvents
