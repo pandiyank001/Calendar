@@ -71,14 +71,14 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1 text-left">Interview Time:  {format(new Date(event.start), "HH:mm")} - {format(new Date(event.end), "HH:mm")}</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1 text-left">Interview Time:  {format(new Date(event.start), "hh:mm a")} - {format(new Date(event.end), "hh:mm a")}</label>
 
             </div>
 
             <div className="space-y-2 pt-2">
               <button
                 onClick={handleResumeDownload}
-                className="flex items-center space-x-2 px-3 py-2 w-48 text-sm text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+                className="flex items-center cursor-pointer space-x-2 px-3 py-2 w-48 text-sm text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 transition-colors"
               >
                 <Eye className="w-4 h-4" />
                 <span>Resume docs</span>
@@ -87,7 +87,7 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
 
               <button
                 onClick={handleAudiocardView}
-                className="flex items-center space-x-2 w-48 px-3 py-2 text-sm text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+                className="flex items-center cursor-pointer space-x-2 w-48 px-3 py-2 text-sm text-blue-600 border border-blue-600 rounded-md hover:bg-blue-50 transition-colors"
               >
                 <Eye className="w-4 h-4" />
                 <span>Audiocard</span>
@@ -107,7 +107,7 @@ export default function EventModal({ event, isOpen, onClose }: EventModalProps) 
 
             <button
               onClick={handleJoinMeeting}
-              className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
+              className="px-8 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer transition-colors font-medium text-sm"
             >
               JOIN
             </button>

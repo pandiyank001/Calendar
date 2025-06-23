@@ -11,6 +11,9 @@ import {
   isSameMonth,
   isSameDay,
   isToday,
+  startOfDay,
+  endOfDay,
+  isWithinInterval,
 } from "date-fns"
 import type { CalendarEvent } from "../../types"
 import EventCard from "../EventCard"
@@ -40,7 +43,18 @@ export default function MonthView({
   const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const getEventsForDate = (date: Date) => {
-    return events.filter((event) => isSameDay(new Date(event.start), date))
+    return events.filter((event) => {
+      const eventStart = new Date(event.start)
+      const eventEnd = new Date(event.end)
+      const dayStart = startOfDay(date)
+      const dayEnd = endOfDay(date)
+
+      return eventStart <= dayEnd && eventEnd >= dayStart
+    })
+  }
+
+  const isEventStartDate = (event: CalendarEvent, date: Date) => {
+    return isSameDay(new Date(event.start), date)
   }
 
   const getGroupedEventsForDate = (date: Date) => {
@@ -100,13 +114,23 @@ export default function MonthView({
                 {groupedEvents.map((group, groupIndex) => (
                   <div key={groupIndex}>
                     {group.events.length === 1 ? (
-                      <EventCard event={group.events[0]} onClick={() => onEventClick(group.events[0])} compact />
+                      <EventCard 
+                        event={group.events[0]} 
+                        onClick={() => onEventClick(group.events[0])} 
+                        compact 
+                        showTimeRange={isEventStartDate(group.events[0], day)}
+                      />
                     ) : (
                       <div
                         className="relative cursor-pointer"
                         onClick={(e) => onDateEventsClick(group.events, e.currentTarget)}
                       >
-                        <EventCard event={group.events[0]} onClick={() => {}} compact />
+                        <EventCard 
+                          event={group.events[0]} 
+                          onClick={() => {}} 
+                          compact 
+                          showTimeRange={isEventStartDate(group.events[0], day)}
+                        />
                         <div className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
                           {group.events.length}
                         </div>

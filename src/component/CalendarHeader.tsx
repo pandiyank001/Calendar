@@ -48,7 +48,7 @@ export default function CalendarHeader({
               onClick={() => onViewTypeChange(type)}
               className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
                 viewType === type ? "bg-white text-blue-600 shadow-sm" : "text-gray-600 hover:text-gray-900"
-              }`}
+              } cursor-pointer`}
             >
               {type}
             </button>

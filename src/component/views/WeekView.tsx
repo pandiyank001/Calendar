@@ -27,10 +27,24 @@ export default function WeekView({ currentDate, events, onEventClick, onDateEven
 
   const getEventsForTimeSlot = (date: Date, hour: number) => {
     const dayEvents = getEventsForDate(date)
+    
     return dayEvents.filter((event) => {
-      const eventHour = new Date(event.start).getHours()
-      return eventHour === hour
+      const eventStart = new Date(event.start)
+      const eventEnd = new Date(event.end)
+      const startHour = eventStart.getHours()
+      const endHour = eventEnd.getHours()
+      
+
+      if (eventEnd.getMinutes() === 0) {
+        return hour >= startHour && hour < endHour
+      } else {
+        return hour >= startHour && hour <= endHour
+      }
     })
+  }
+
+  const isEventStartHour = (event: CalendarEvent, hour: number) => {
+    return new Date(event.start).getHours() === hour
   }
 
   if (loading) {
@@ -75,11 +89,23 @@ export default function WeekView({ currentDate, events, onEventClick, onDateEven
                     {groupedEvents.map((group, groupIndex) => (
                       <div key={groupIndex}>
                         {group.events.length === 1 ? (
-                          <EventCard event={group.events[0]} onClick={() => onEventClick(group.events[0])} compact />
+                          <EventCard 
+                            event={group.events[0]} 
+                            onClick={() => onEventClick(group.events[0])} 
+                            compact 
+                            showTimeRange={isEventStartHour(group.events[0], hour)}
+                          />
                         ) : (
-                          <div onClick={(e) => onDateEventsClick(group.events, e.currentTarget)}
-                            className="relative cursor-pointer">
-                            <EventCard event={group.events[0]} onClick={() => { }} compact />
+                          <div 
+                            onClick={(e) => onDateEventsClick(group.events, e.currentTarget)}
+                            className="relative cursor-pointer"
+                          >
+                            <EventCard 
+                              event={group.events[0]} 
+                              onClick={() => { }} 
+                              compact 
+                              showTimeRange={isEventStartHour(group.events[0], hour)}
+                            />
                             <div className="absolute -top-1 -right-1 bg-yellow-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
                               {group.events.length}
                             </div>

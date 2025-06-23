@@ -6,6 +6,7 @@ import CalendarHeader from "./CalendarHeader"
 import MonthView from "./views/MonthView"
 import WeekView from "./views/WeekView"
 import DayView from "./views/DayView"
+import YearView from "./views/YearView"
 import EventModal from "./modal/EventModal"
 import EventListModal from "./modal/EventListModal"
 import type { CalendarEvent, ViewType } from "../types"
@@ -100,14 +101,13 @@ export default function Calendar() {
   }
 
   const handleEventClick = (event: CalendarEvent) => {
-  setSelectedEvent(event)
-  setIsEventModalOpen(true)
+    setSelectedEvent(event)
+    setIsEventModalOpen(true)
 
-  setIsEventListModalOpen(false)
-  setSelectedDateEvents([])
-  setEventAnchorRect(null)
-}
-
+    setIsEventListModalOpen(false)
+    setSelectedDateEvents([])
+    setEventAnchorRect(null)
+  }
 
   const handleDateEventsClick = (dateEvents: CalendarEvent[], anchorEl: HTMLElement) => {
     const rect = anchorEl.getBoundingClientRect()
@@ -120,6 +120,11 @@ export default function Calendar() {
     setEventAnchorRect(rect)
     setEventModalDirection(direction)
     setIsEventListModalOpen(true)
+  }
+
+  const handleMonthClick = (month: Date) => {
+    setCurrentDate(month)
+    setViewType("Month")
   }
 
   const getDateRangeText = () => {
@@ -154,7 +159,7 @@ export default function Calendar() {
       case "Month":
         return <MonthView {...commonProps} />
       case "Year":
-        return <MonthView {...commonProps} />
+        return <YearView {...commonProps} onMonthClick={handleMonthClick} />
       default:
         return <MonthView {...commonProps} />
     }

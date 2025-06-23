@@ -27,9 +27,23 @@ export default function DayView({
     const dayEvents = events.filter((event) =>
       isSameDay(new Date(event.start), currentDate)
     )
-    return dayEvents.filter(
-      (event) => new Date(event.start).getHours() === hour
-    )
+    
+    return dayEvents.filter((event) => {
+      const eventStart = new Date(event.start)
+      const eventEnd = new Date(event.end)
+      const startHour = eventStart.getHours()
+      const endHour = eventEnd.getHours()
+
+      if (eventEnd.getMinutes() === 0) {
+        return hour >= startHour && hour < endHour
+      } else {
+        return hour >= startHour && hour <= endHour
+      }
+    })
+  }
+
+  const isEventStartHour = (event: CalendarEvent, hour: number) => {
+    return new Date(event.start).getHours() === hour
   }
 
   if (loading) {
@@ -81,6 +95,7 @@ export default function DayView({
                           <EventCard
                             event={group.events[0]}
                             onClick={() => onEventClick(group.events[0])}
+                            showTimeRange={isEventStartHour(group.events[0], hour)}
                           />
                         </div>
                       ) : (
@@ -93,6 +108,7 @@ export default function DayView({
                           <EventCard
                             event={group.events[0]}
                             onClick={() => {}}
+                            showTimeRange={isEventStartHour(group.events[0], hour)}
                           />
                           <div className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-medium">
                             {group.events.length}
