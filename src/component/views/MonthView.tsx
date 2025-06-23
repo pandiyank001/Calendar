@@ -13,7 +13,6 @@ import {
   isToday,
   startOfDay,
   endOfDay,
-  isWithinInterval,
 } from "date-fns"
 import type { CalendarEvent } from "../../types"
 import EventCard from "../EventCard"

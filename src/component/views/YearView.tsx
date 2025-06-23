@@ -12,14 +12,12 @@ import {
   endOfWeek,
   eachDayOfInterval,
   isSameMonth,
-  isSameDay,
   isToday,
   startOfDay,
   endOfDay,
   getYear,
 } from "date-fns"
 import type { CalendarEvent } from "../../types"
-import { groupEventsByDateTime } from "../../utils/calendarutils"
 
 interface YearViewProps {
   currentDate: Date
