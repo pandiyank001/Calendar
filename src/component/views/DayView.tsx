@@ -75,7 +75,7 @@ export default function DayView({
     if (minDurationPercentage >= 1) return BASE_SLOT_HEIGHT
 
     const inversePercentage = 1 - minDurationPercentage
-    const additionalHeight = inversePercentage * 155 
+    const additionalHeight = inversePercentage * 125 
     const expandedHeight = BASE_SLOT_HEIGHT + additionalHeight
 
     return Math.round(expandedHeight)
