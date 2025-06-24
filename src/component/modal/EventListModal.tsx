@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { X } from "lucide-react"
+import { useEffect, useRef } from "react"
 import type { CalendarEvent } from "../../types"
 import EventCard from "../EventCard"
 
@@ -22,6 +23,32 @@ export default function EventListModal({
   onClose,
   onEventClick,
 }: EventListModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isOpen, onClose])
+
   if (!isOpen || !anchorRect) return null
 
   const offset = 20
@@ -39,6 +66,7 @@ export default function EventListModal({
 
   return (
     <motion.div
+      ref={modalRef}
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       exit={{ scale: 0.95, opacity: 0 }}
