@@ -22,6 +22,7 @@ export default function DayView({
   loading,
 }: DayViewProps) {
   const timeSlots = Array.from({ length: 24 }, (_, i) => i)
+  const BASE_SLOT_HEIGHT = 80 
 
   const getEventsForTimeSlot = (hour: number) => {
     const dayEvents = events.filter((event) =>
@@ -33,17 +34,66 @@ export default function DayView({
       const eventEnd = new Date(event.end)
       const startHour = eventStart.getHours()
       const endHour = eventEnd.getHours()
+      const endMinutes = eventEnd.getMinutes()
 
-      if (eventEnd.getMinutes() === 0) {
-        return hour >= startHour && hour < endHour
-      } else {
-        return hour >= startHour && hour <= endHour
-      }
+
+      const eventStartsInThisHour = startHour === hour
+      const eventCoversThisHour = startHour < hour && (endHour > hour || (endHour === hour && endMinutes > 0))
+      
+      return eventStartsInThisHour || eventCoversThisHour
     })
   }
 
   const isEventStartHour = (event: CalendarEvent, hour: number) => {
     return new Date(event.start).getHours() === hour
+  }
+
+  const calculateEventDurationPercentage = (event: CalendarEvent) => {
+    const eventStart = new Date(event.start)
+    const eventEnd = new Date(event.end)
+    
+    const totalDurationMs = eventEnd.getTime() - eventStart.getTime()
+    const totalDurationMinutes = totalDurationMs / (1000 * 60)
+    
+    const durationPercentage = Math.min(totalDurationMinutes / 60, 1)
+    
+    return durationPercentage 
+  }
+
+  const getSlotHeight = (hour: number) => {
+    const timeSlotEvents = getEventsForTimeSlot(hour)
+    
+    if (timeSlotEvents.length === 0) {
+      return BASE_SLOT_HEIGHT
+    }
+    
+    const eventsStartingInThisHour = timeSlotEvents.filter(event => isEventStartHour(event, hour))
+    
+    if (eventsStartingInThisHour.length === 0) {
+      return BASE_SLOT_HEIGHT
+    }
+
+    const minDurationPercentage = eventsStartingInThisHour.reduce((min, event) => {
+      const durationPercentage = calculateEventDurationPercentage(event)
+      return Math.min(min, durationPercentage)
+    }, 1)
+    
+    const inversePercentage = 1 - minDurationPercentage
+    const additionalHeight = inversePercentage * 200
+    const expandedHeight = BASE_SLOT_HEIGHT + additionalHeight
+    return Math.round(expandedHeight)
+  }
+
+  const getEventContainerHeight = (event: CalendarEvent, slotHeight: number) => {
+    const durationPercentage = calculateEventDurationPercentage(event)
+    
+    const availableSpace = slotHeight - 20 
+    const inversePercentage = 1 - durationPercentage
+    
+    const baseEventHeight = 50 
+    const eventContainerHeight = baseEventHeight + (availableSpace - baseEventHeight) * inversePercentage
+    
+    return Math.max(50, eventContainerHeight)
   }
 
   if (loading) {
@@ -66,11 +116,13 @@ export default function DayView({
         {timeSlots.map((hour) => {
           const timeSlotEvents = getEventsForTimeSlot(hour)
           const groupedEvents = groupEventsByDateTime(timeSlotEvents)
+          const slotHeight = getSlotHeight(hour)
 
           return (
             <div
               key={hour}
-              className="flex border-b border-gray-100 min-h-[80px]"
+              className="flex border-b border-gray-100"
+              style={{ minHeight: `${slotHeight}px` }}
             >
               <div className="w-20 p-2 text-right text-xs text-blue-600 font-medium border-r border-gray-200 flex-shrink-0">
                 {hour === 0
@@ -87,36 +139,51 @@ export default function DayView({
                 animate={{ opacity: 1 }}
                 className="flex-1 p-2 hover:bg-gray-50 transition-colors"
               >
-                <div className="space-y-2">
-                  {groupedEvents.map((group, groupIndex) => (
-                    <div key={groupIndex}>
-                      {group.events.length === 1 ? (
-                        <div className="w-fit max-w-[220px]">
-                          <EventCard
-                            event={group.events[0]}
-                            onClick={() => onEventClick(group.events[0])}
-                            showTimeRange={isEventStartHour(group.events[0], hour)}
-                          />
-                        </div>
-                      ) : (
-                        <div
-                          onClick={(e) =>
-                            onDateEventsClick(group.events, e.currentTarget)
-                          }
-                          className="relative cursor-pointer w-fit max-w-[220px]"
-                        >
-                          <EventCard
-                            event={group.events[0]}
-                            onClick={() => {}}
-                            showTimeRange={isEventStartHour(group.events[0], hour)}
-                          />
-                          <div className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-medium">
-                            {group.events.length}
+                <div className="space-y-2 flex flex-col">
+                  {groupedEvents.map((group, groupIndex) => {
+                    const isStartingEvent = isEventStartHour(group.events[0], hour)
+                    const eventContainerHeight = isStartingEvent 
+                      ? getEventContainerHeight(group.events[0], slotHeight)
+                      : 'auto'
+                    
+                    return (
+                      <div key={groupIndex}>
+                        {group.events.length === 1 ? (
+                          <div 
+                            className="w-fit max-w-[220px] flex items-start"
+                            style={{
+                              height: eventContainerHeight !== 'auto' ? `${eventContainerHeight}px` : 'auto'
+                            }}
+                          >
+                            <EventCard
+                              event={group.events[0]}
+                              onClick={() => onEventClick(group.events[0])}
+                              showTimeRange={isStartingEvent}
+                            />
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        ) : (
+                          <div
+                            onClick={(e) =>
+                              onDateEventsClick(group.events, e.currentTarget)
+                            }
+                            className="relative cursor-pointer w-fit max-w-[220px] flex items-start"
+                            style={{
+                              height: eventContainerHeight !== 'auto' ? `${eventContainerHeight}px` : 'auto'
+                            }}
+                          >
+                            <EventCard
+                              event={group.events[0]}
+                              onClick={() => {}}
+                              showTimeRange={isStartingEvent}
+                            />
+                            <div className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-medium">
+                              {group.events.length}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </motion.div>
             </div>
