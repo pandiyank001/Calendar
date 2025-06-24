@@ -134,8 +134,6 @@ export default function WeekView({ currentDate, events, onEventClick, onDateEven
                 const timeSlotEvents = getEventsForTimeSlot(day, hour)
                 const groupedEvents = groupEventsByDateTime(timeSlotEvents)
                 
-                const dynamicHourHeight = calculateDynamicHourHeight(day, hour)
-
                 return (
                   <motion.div
                     key={`${day.toISOString()}-${hour}`}
