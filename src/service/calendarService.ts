@@ -6,7 +6,7 @@ const mockEvents: CalendarEvent[] = [
     summary: "1st Round",
     desc: "1st Round",
     start: "2025-06-14T01:00:00+05:30",
-    end: "2025-06-14T01:40:00+05:30",
+    end: "2025-06-14T02:00:00+05:30",
     attendees: null,
     status: null,
     comment: null,
