@@ -22,7 +22,7 @@ export default function DayView({
   loading,
 }: DayViewProps) {
   const timeSlots = Array.from({ length: 24 }, (_, i) => i)
-  const BASE_SLOT_HEIGHT = 115 
+  const BASE_SLOT_HEIGHT = 105
 
   const getEventsForTimeSlot = (hour: number) => {
     const dayEvents = events.filter((event) =>
@@ -75,7 +75,7 @@ export default function DayView({
     if (minDurationPercentage >= 1) return BASE_SLOT_HEIGHT
 
     const inversePercentage = 1 - minDurationPercentage
-    const additionalHeight = inversePercentage * 280 
+    const additionalHeight = inversePercentage * 200 
     const expandedHeight = BASE_SLOT_HEIGHT + additionalHeight
 
     return Math.round(expandedHeight)
@@ -88,8 +88,8 @@ export default function DayView({
       return BASE_SLOT_HEIGHT - 50 
     }
 
-    const availableSpace = slotHeight - 40 
-    const baseEventHeight = 70 
+    const availableSpace = slotHeight - 35 
+    const baseEventHeight = 60 
     const inversePercentage = 1 - durationPercentage
     const eventContainerHeight = baseEventHeight + (availableSpace - baseEventHeight) * inversePercentage
 
